@@ -1,3 +1,4 @@
+const crypto = require('crypto'); // මෙතන crypto එකතු කරා
 const sharp = require('sharp');
 const express = require('express');
 const fs = require('fs-extra');
@@ -92,7 +93,7 @@ async function connectMongoDB() {
 
     } catch (error) {
         console.error('MongoDB connection failed:', error);
-        process.exit(1);
+        // process.exit(1); // App එක crash වෙන නිසා මේක අයින් කරා
     }
 }
 connectMongoDB();
