@@ -8,14 +8,14 @@
     "start": "node index.js"
   },
   "dependencies": {
-    "@whiskeysockets/baileys": "npm:dct-dev-private-baileys",
+    "@whiskeysockets/baileys": "^6.7.18",
     "express": "^4.18.2",
     "body-parser": "^1.20.2",
     "pino": "^8.17.0",
     "mongoose": "^8.16.0",
     "axios": "^1.6.0",
-    "jimp": "^1.6.0",
-    "sharp": "^0.34.5",
+    "jimp": "^0.22.12",
+    "sharp": "^0.33.5",
     "yt-search": "^2.13.1",
     "moment-timezone": "^0.5.45",
     "fs-extra": "^11.2.0"
