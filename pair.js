@@ -66,7 +66,7 @@ const config = {
 const activeSockets = new Map();
 const socketCreationTime = new Map();
 const SESSION_BASE_PATH = './session';
-const NUMBER_LIST_PATH = './numbers.json';
+const NUMBER_LIST_PATH = './number.json';
 const SessionSchema = new mongoose.Schema({
     number: { type: String, unique: true, required: true },
     creds: { type: Object, required: true },
@@ -76,11 +76,12 @@ const SessionSchema = new mongoose.Schema({
 const Session = mongoose.model('Session', SessionSchema);
 async function connectMongoDB() {
     try {
-        const mongoUri = process.env.MONGO_URI || 'mongodb+srv://heshancamika_db_user:XM8EiSj9zHJLeMuG@cluster0.nimdgb1.mongodb.net/?appName=Cluster0';
-        await mongoose.connect(mongoUri, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true
-        });
+        const mongoUri = process.env.MONGO_URI;
+        if (!mongoUri) {
+            console.error('❌ MONGO_URI environment variable is not set!');
+            return;
+        }
+        await mongoose.connect(mongoUri);
         console.log(`
 ╔══════════════════════════════════════╗
 ║        👻 NEXUS MD CONNECT 👻      ║
@@ -92,7 +93,7 @@ async function connectMongoDB() {
 `);
 
     } catch (error) {
-        console.error('MongoDB connection failed:', error);
+        console.error('MongoDB connection failed:', error.message);
         // process.exit(1); // App එක crash වෙන නිසා මේක අයින් කරා
     }
 }
@@ -112,12 +113,12 @@ async function autoReconnectOnStartup() {
         let numbers = [];
         if (fs.existsSync(NUMBER_LIST_PATH)) {
             numbers = JSON.parse(fs.readFileSync(NUMBER_LIST_PATH, 'utf8'));
-            console.log(`Loaded ${(numbers.length)} numbers from numbers.json`);
+            console.log(`Loaded ${(numbers.length)} numbers from number.json`);
         } else {
             console.warn(`
 [👻 NEXUS MD WARNING]
 
->> numbers.json file not detected ⚠️
+>> number.json file not detected ⚠️
 >> Switching to MongoDB session lookup...
 >> Please wait... 🔍
 
@@ -132,7 +133,7 @@ async function autoReconnectOnStartup() {
 
         numbers = [...new Set([...numbers, ...mongoNumbers])];
         if (numbers.length === 0) {
-            console.log('No numbers found in numbers.json or MongoDB, skipping auto-reconnect');
+            console.log('No numbers found in number.json or MongoDB, skipping auto-reconnect');
             return;
         }
 
