@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>DCL MINI - WhatsApp Bot Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <nav class="navbar">
+    <div class="logo">⚡ DCL MINI</div>
+    <div class="navlinks">
+      <a href="/">Home</a>
+      <a href="/pair">Pairing</a>
+      <a href="/docs">Docs</a>
+      <a href="/about">About</a>
+      <a href="/contact">Contact</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <section class="hero">
+      <h1>The <span>Professional</span> WhatsApp<br/>Multi Device Bot</h1>
+      <p>Fast, stable, production-ready — powered by Baileys & MongoDB session storage.</p>
+      <div class="btn-row">
+        <a href="/pair" class="btn btn-primary">🔗 Pair Your Number</a>
+        <a href="/docs" class="btn btn-outline">📖 View Docs</a>
+      </div>
+    </section>
+
+    <section class="grid" id="statusGrid">
+      <div class="card">
+        <div class="stat-number" id="statusText">…</div>
+        <p>Bot Status</p>
+      </div>
+      <div class="card">
+        <div class="stat-number" id="uptimeText">…</div>
+        <p>Uptime</p>
+      </div>
+      <div class="card">
+        <div class="stat-number" id="commandCount">…</div>
+        <p>Commands Loaded</p>
+      </div>
+      <div class="card">
+        <div class="stat-number">24/7</div>
+        <p>Always Online</p>
+      </div>
+    </section>
+
+    <section class="grid" style="margin-top:70px">
+      <div class="card"><div class="icon">🔐</div><h3>MongoDB Sessions</h3><p>No local session files — encrypted, portable, multi-device ready.</p></div>
+      <div class="card"><div class="icon">🧩</div><h3>Modular Commands</h3><p>Owner, group, download, AI, utility & fun commands — organized by category.</p></div>
+      <div class="card"><div class="icon">🛡️</div><h3>Anti-Spam & Anti-Crash</h3><p>Rate limiting, blocklists and error boundaries keep the bot stable 24/7.</p></div>
+      <div class="card"><div class="icon">🚀</div><h3>Deploy Anywhere</h3><p>Heroku, Railway, Render, VPS + Docker + PM2 support out of the box.</p></div>
+    </section>
+  </div>
+
+  <footer>DCL MINI &copy; 2026 — Built with Baileys, Node.js & MongoDB</footer>
+
+  <script>
+    async function loadStatus() {
+      try {
+        const res = await fetch('/api/status');
+        const data = await res.json();
+        document.getElementById('statusText').textContent = data.connected ? 'Online' : 'Offline';
+        const mins = Math.floor(data.uptimeMs / 60000);
+        document.getElementById('uptimeText').textContent = mins < 60 ? `${mins}m` : `${(mins/60).toFixed(1)}h`;
+      } catch { document.getElementById('statusText').textContent = 'Unknown'; }
+      try {
+        const res2 = await fetch('/api/commands');
+        const cmds = await res2.json();
+        document.getElementById('commandCount').textContent = cmds.length;
+      } catch {}
+    }
+    loadStatus();
+    setInterval(loadStatus, 10000);
+  </script>
+</body>
+</html>
