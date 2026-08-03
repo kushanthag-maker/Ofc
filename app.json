@@ -1,0 +1,19 @@
+{
+  "name": "DCL MINI",
+  "description": "Professional WhatsApp Multi Device Bot with MongoDB session storage",
+  "repository": "https://github.com/yourusername/dcl-mini",
+  "env": {
+    "MONGODB_URI": { "description": "Your MongoDB Atlas connection string", "required": true },
+    "BOT_NAME": { "description": "Bot display name", "value": "DCL MINI" },
+    "OWNER_NAME": { "description": "Your name", "required": true },
+    "OWNER_NUMBER": { "description": "Your WhatsApp number with country code", "required": true },
+    "PREFIX": { "description": "Command prefix", "value": "." },
+    "PAIRING_METHOD": { "description": "code or qr", "value": "code" }
+  },
+  "formation": {
+    "worker": { "quantity": 1, "size": "eco" }
+  },
+  "buildpacks": [
+    { "url": "heroku/nodejs" }
+  ]
+}
