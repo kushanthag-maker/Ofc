@@ -1,0 +1,10 @@
+version: '3.8'
+services:
+  dcl-mini:
+    build: .
+    container_name: dcl-mini
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
