@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Pair Your Number - DCL MINI</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <nav class="navbar">
+    <div class="logo">⚡ DCL MINI</div>
+    <div class="navlinks">
+      <a href="/">Home</a>
+      <a href="/pair">Pairing</a>
+      <a href="/docs">Docs</a>
+      <a href="/about">About</a>
+      <a href="/contact">Contact</a>
+    </div>
+  </nav>
+
+  <div class="pair-card">
+    <h2>Connect Your WhatsApp</h2>
+    <p class="hint">Link your number to DCL MINI in seconds</p>
+
+    <div class="tabs">
+      <div class="tab active" data-mode="code" onclick="switchTab('code')">Pairing Code</div>
+      <div class="tab" data-mode="qr" onclick="switchTab('qr')">QR Code</div>
+    </div>
+
+    <div id="codeMode">
+      <input type="text" id="numberInput" placeholder="94xxxxxxxxx (with country code)" />
+      <div class="btn-row" style="margin-top:20px">
+        <button class="btn btn-primary" style="border:none;cursor:pointer" onclick="requestCode()">Get Pairing Code</button>
+      </div>
+      <div id="codeResult"></div>
+    </div>
+
+    <div id="qrMode" style="display:none">
+      <img id="qrImage" src="" alt="Scan this QR code" style="display:none" />
+      <div id="qrResult"></div>
+      <p class="hint">Open WhatsApp → Linked Devices → Link a Device</p>
+    </div>
+  </div>
+
+  <footer>DCL MINI &copy; 2026 — Built with Baileys, Node.js & MongoDB</footer>
+
+  <script>
+    function switchTab(mode) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.mode === mode));
+      document.getElementById('codeMode').style.display = mode === 'code' ? 'block' : 'none';
+      document.getElementById('qrMode').style.display = mode === 'qr' ? 'block' : 'none';
+      if (mode === 'qr') pollQR();
+    }
+
+    async function requestCode() {
+      const number = document.getElementById('numberInput').value.replace(/\D/g, '');
+      const resultEl = document.getElementById('codeResult');
+      if (!number) { resultEl.innerHTML = '<p class="hint" style="color:#ff5470">Enter a valid number with country code.</p>'; return; }
+
+      resultEl.innerHTML = '<div class="spinner"></div><p class="hint">Requesting pairing code...</p>';
+
+      try {
+        const res = await fetch('/api/pair', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ number }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to get code');
+
+        resultEl.innerHTML = `
+          <div class="code-box" onclick="copyCode('${data.code}')">${data.code}</div>
+          <p class="hint">Tap the code to copy · Enter it in WhatsApp → Linked Devices</p>
+        `;
+      } catch (err) {
+        resultEl.innerHTML = `<div class="error-x">✖</div><p class="hint" style="color:#ff5470">${err.message}</p>`;
+      }
+    }
+
+    function copyCode(code) {
+      navigator.clipboard.writeText(code);
+      const box = document.querySelector('.code-box');
+      const original = box.textContent;
+      box.textContent = 'Copied!';
+      setTimeout(() => (box.textContent = original), 1200);
+    }
+
+    async function pollQR() {
+      const qrResult = document.getElementById('qrResult');
+      const qrImg = document.getElementById('qrImage');
+      qrResult.innerHTML = '<div class="spinner"></div>';
+      try {
+        const res = await fetch('/api/qr');
+        if (!res.ok) throw new Error('QR not ready yet, retrying...');
+        const data = await res.json();
+        qrImg.src = data.qr;
+        qrImg.style.display = 'block';
+        qrResult.innerHTML = '';
+      } catch (err) {
+        qrResult.innerHTML = `<p class="hint">${err.message}</p>`;
+        setTimeout(pollQR, 3000);
+      }
+    }
+  </script>
+</body>
+</html>
